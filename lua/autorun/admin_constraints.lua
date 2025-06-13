@@ -5,24 +5,29 @@ elseif CLIENT then
     local function CheckAdmin() -- Check if the player has permission to modify constraint limits
         local ply = LocalPlayer()
         if not IsValid(ply) or not ply.IsAdmin then return false end
-        local RestrictToSuperAdmin = GetConVar("welds_superadminonly"):GetBool() -- Check if superadmin restriction is enabled
-        if RestrictToSuperAdmin then
-            print("Superadmin restriction is enabled, checking player status")
-            if ply:IsSuperAdmin() then
-                print("Player is a superadmin, permission granted")
-                return true -- Superadmin has permission
+        local AdminVar = GetConVar("welds_superadminonly") -- Check if superadmin restriction is enabled
+        if IsValid(AdminVar) then
+            if AdminVar:GetBool() then
+                print("Superadmin restriction is enabled, checking player status")
+                if ply:IsSuperAdmin() then
+                    print("Player is a superadmin, permission granted")
+                    return true -- Superadmin has permission
+                else
+                    print("Player is not a superadmin, permission denied")
+                    return false -- Non-superadmin does not have permission
+                end
             else
-                print("Player is not a superadmin, permission denied")
-                return false -- Non-superadmin does not have permission
+                if ply:IsAdmin() then
+                    print("Player is an admin, permission granted")
+                    return true -- Admin has permission
+                else
+                    print("Player is not an admin, permission denied")
+                    return false -- Non-admin does not have permission
+                end
             end
         else
-            if ply:IsAdmin() then
-                print("Player is an admin, permission granted")
-                return true -- Admin has permission
-            else
-                print("Player is not an admin, permission denied")
-                return false -- Non-admin does not have permission
-            end
+            print("Admin convar not found")
+            return false
         end
     end
 

@@ -3,4 +3,8 @@ if SERVER then
     CreateConVar("sbox_maxropeconstraints", 1000, FCVAR_ARCHIVE, "Max rope constraints limit")
     CreateConVar("welds_superadminonly", 1, FCVAR_ARCHIVE, "Restrict constraint limit modifications to superadmins only")
     CreateConVar("test_cheeseworks", 65, FCVAR_ARCHIVE, "Cheeseworks test convar") -- debug
+    return
+else
+    print("Server instance not found")
+    return
 end

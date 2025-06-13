@@ -30,14 +30,13 @@ elseif CLIENT then
             pnl:Help("Adjust the maximum number of constraints allowed on the server.")
             pnl:NumSlider("Max Constraints", "sbox_maxconstraints", 100, 2000, 0)
             pnl:NumSlider("Max Rope Constraints", "sbox_maxropeconstraints", 100, 2000, 0)
+            if LocalPlayer():IsSuperAdmin() then -- Check if the player is a superadmin
+                print("Superadmin detected, adding superadmin-only constraint permission setting")
+                pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
+                pnl:CheckBox("Restrict to Super-Admins", "welds_superadminonly")
+            end
         else
             print("Player does not have permission to modify constraint limits")
-        end
-
-        if LocalPlayer():IsSuperAdmin() then -- Check if the player is a superadmin
-            print("Superadmin detected, adding superadmin-only constraint permission setting")
-            pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
-            pnl:CheckBox("Restrict to Super-Admins", "welds_superadminonly")
         end
     end
 

@@ -3,7 +3,7 @@ if SERVER then -- Client-side only
     return
 elseif CLIENT then
     local function CheckAdmin() -- Check if the player has permission to modify constraint limits
-        local ply = LocalPlayer()
+        local ply = LocalPlayer() -- Check if player object is valid
         if not IsValid(ply) or not ply.IsAdmin then return false end
         local AdminVar = GetConVar("welds_superadminonly") -- Check if superadmin restriction is enabled
         if IsValid(AdminVar) then
@@ -32,7 +32,7 @@ elseif CLIENT then
     end
 
     local function AdminConstraintSlider(pnl) -- Add a slider to update constraint limits
-        local ply = LocalPlayer()
+        local ply = LocalPlayer() -- Check if player object is valid
         if not IsValid(ply) or not ply.IsAdmin then return false end
         if CheckAdmin() then -- Check for admin
             print("Player has permission to modify constraint limits")
@@ -46,7 +46,7 @@ elseif CLIENT then
             end
         else
             print("Player does not have permission to modify constraint limits")
-            local msgTxt = "you cannot change constraint limits."
+            local msgTxt = "you cannot change constraint limits." -- Help text
             local AdminVar = GetConVar("welds_superadminonly") -- Check if superadmin restriction is enabled
             if IsValid(AdminVar) then
                 if AdminVar:GetBool() then
@@ -58,13 +58,14 @@ elseif CLIENT then
                 print("Admin convar not found")
             end
 
+            print("Creating help text for player...")
             pnl:Help("You're a player, " .. msgTxt)
         end
     end
 
     hook.Add("PopulateToolMenu", "AdminConstraintSettings", function()
         -- Hook spawnmenu to add the slider
-        spawnmenu.AddToolMenuOption("Utilities", "Admin", "ServerConstraintSettings", "Constraint Limits", "", "", AdminConstraintSlider)
+        spawnmenu.AddToolMenuOption("Utilities", "Admin", "ServerConstraintSettings", "Fix Constraint Limits", "", "", AdminConstraintSlider)
     end)
     return
 else

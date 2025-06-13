@@ -46,6 +46,15 @@ elseif CLIENT then
             end
         else
             print("Player does not have permission to modify constraint limits")
+            local msgTxt = "you cannot change constraint limits."
+            local AdminVar = GetConVar("welds_superadminonly") -- Check if superadmin restriction is enabled
+            if AdminVar:GetBool() then
+                msgTxt = "please ask a superadmin to change constraint limits if you wish."
+            else
+                msgTxt = "if you wish to change constraint limits, please ask an admin or above."
+            end
+
+            pnl:Help("You're a player, " .. msgTxt)
         end
     end
 

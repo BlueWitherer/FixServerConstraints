@@ -1,5 +1,5 @@
 if SERVER then -- Client-side only
-    print("This script is intended for client-side execution only")
+    print("Spawnmenu panel script is intended for client-side execution only")
     return
 elseif CLIENT then
     local function CheckAdmin() -- Check if the player has permission to modify constraint limits
@@ -48,10 +48,14 @@ elseif CLIENT then
             print("Player does not have permission to modify constraint limits")
             local msgTxt = "you cannot change constraint limits."
             local AdminVar = GetConVar("welds_superadminonly") -- Check if superadmin restriction is enabled
-            if AdminVar:GetBool() then
-                msgTxt = "please ask a superadmin to change constraint limits if you wish."
+            if IsValid(AdminVar) then
+                if AdminVar:GetBool() then
+                    msgTxt = "please ask a superadmin to change constraint limits if you wish."
+                else
+                    msgTxt = "if you wish to change constraint limits, please ask an admin or above."
+                end
             else
-                msgTxt = "if you wish to change constraint limits, please ask an admin or above."
+                print("Admin convar not found")
             end
 
             pnl:Help("You're a player, " .. msgTxt)
@@ -64,6 +68,6 @@ elseif CLIENT then
     end)
     return
 else
-    print("Client or server not found")
+    print("Client not found")
     return
 end

@@ -1,11 +1,22 @@
-FscPrint = function(...)
-    -- Pretty print for this addon
+local printFormat = function(...)
     local args = {...}
     local msg = ""
     for i, v in ipairs(args) do
         msg = msg .. tostring(v)
         if i < #args then msg = msg .. "\t" end
     end
-
-    MsgC(Color(255, 186, 245), "[FixServerConstraints] ", color_white, msg .. "\n")
+    return msg
 end
+
+local consoleMsg = function(color, tag, ...)
+    local msg = printFormat(...)
+    return MsgC(Color(255, 186, 245), "[FixServerConstraints] ", color, tag .. ": ", msg .. "\n")
+end
+
+FscPrint = {
+    log = function(...) return consoleMsg(Color(255, 255, 255), "LOG", ...) end,
+    debug = function(...) return consoleMsg(Color(136, 136, 136), "DEBUG", ...) end,
+    info = function(...) return consoleMsg(Color(107, 146, 253), "INFO", ...) end,
+    warn = function(...) return consoleMsg(Color(255, 244, 159), "WARN", ...) end,
+    error = function(...) return consoleMsg(Color(255, 103, 103), "ERROR", ...) end
+}

@@ -4,13 +4,13 @@ if CLIENT then -- Client-side only
     local CheckAdmin = function()
         -- Check if the player has permission to modify constraint limits
         FscPrint.debug("Checking if player has admin...")
-        local Plr = LocalPlayer()
-        if IsValid(Plr) then -- Check if player object is valid
+        local ply = LocalPlayer()
+        if IsValid(ply) then -- Check if player object is valid
             local AdminVar = GetConVar("welds_superadminonly") -- Check if superadmin restriction is enabled
             if AdminVar then -- Check that convar is loaded
                 if AdminVar:GetBool() then
                     FscPrint.debug("Superadmin restriction is enabled, checking player status")
-                    if Plr:IsSuperAdmin() then
+                    if ply:IsSuperAdmin() then
                         FscPrint.info("Player is a superadmin, permission granted")
                         return true -- Superadmin has permission
                     else
@@ -18,7 +18,7 @@ if CLIENT then -- Client-side only
                         return false -- Non-superadmin does not have permission
                     end
                 else
-                    if Plr:IsAdmin() then
+                    if ply:IsAdmin() then
                         FscPrint.info("Player is an admin, permission granted")
                         return true -- Admin has permission
                     else
@@ -39,14 +39,14 @@ if CLIENT then -- Client-side only
     local AdminConstraintSlider = function(pnl)
         -- Add a slider to update constraint limits
         FscPrint.debug("Setting up constraint limit sliders to spawnmenu utilities...")
-        local Plr = LocalPlayer()
-        if IsValid(Plr) then -- Check if player object is valid
+        local ply = LocalPlayer()
+        if IsValid(ply) then -- Check if player object is valid
             if CheckAdmin() then -- Check for admin
                 FscPrint.info("Player has permission to modify constraint limits")
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
                 pnl:NumSlider("Max Constraints", "sbox_maxconstraints", 100, 2000, 0)
                 pnl:NumSlider("Max Rope Constraints", "sbox_maxropeconstraints", 100, 2000, 0)
-                if Plr:IsSuperAdmin() then -- Check if the player is a superadmin
+                if ply:IsSuperAdmin() then -- Check if the player is a superadmin
                     FscPrint.info("Superadmin detected, adding superadmin-only constraint permission setting")
                     pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
                     pnl:CheckBox("Restrict to Super-Admins", "welds_superadminonly")
@@ -80,14 +80,14 @@ if CLIENT then -- Client-side only
         -- Hook spawnmenu to add the slider
         spawnmenu.AddToolMenuOption("Utilities", "Admin", "FixedServerConstraintSettings", "Fix Constraint Limits", "", "", AdminConstraintSlider)
         FscPrint.log("Hooked spawnmenu")
-        local Plr = LocalPlayer()
-        if IsValid(Plr) then
-            if Plr:IsSuperAdmin() then
-                FscPrint.debug("Player" .. Plr:Nick() .. "is superadmin")
-            elseif Plr:IsAdmin() then
-                FscPrint.debug("Player" .. Plr:Nick() .. "is admin")
+        local ply = LocalPlayer()
+        if IsValid(ply) then
+            if ply:IsSuperAdmin() then
+                FscPrint.debug("Player" .. ply:Nick() .. "is superadmin")
+            elseif ply:IsAdmin() then
+                FscPrint.debug("Player" .. ply:Nick() .. "is admin")
             else
-                FscPrint.debug("Player" .. Plr:Nick() .. "is nonadmin")
+                FscPrint.debug("Player" .. ply:Nick() .. "is nonadmin")
             end
         else
             FscPrint.error("Couldn't scan player's permissions early")

@@ -37,7 +37,7 @@ if CLIENT then -- Client-side only
         end
     end
 
-    local AdminConstraintSlider = function(pnl)
+    local ConstraintSettings = function(pnl)
         -- Add a slider to update constraint limits
         log:debug("Setting up constraint limit sliders to spawnmenu utilities...")
         local ply = LocalPlayer()
@@ -52,14 +52,6 @@ if CLIENT then -- Client-side only
                     log:debug("Sending request to server...")
                     net.Start("FSC_ResetConstraintConVars")
                     net.SendToServer()
-                end
-
-                if ply:IsSuperAdmin() then -- Check if the player is a superadmin
-                    log:info("Superadmin detected, adding superadmin-only constraint permission setting")
-                    pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
-                    pnl:CheckBox("Restrict to Super-Admins", vars.adminperm.name)
-                else
-                    log:warn("Player does not have permission to modify constraint permissions")
                 end
             else
                 log:warn("Player does not have permission to modify constraint limits")
@@ -79,33 +71,60 @@ if CLIENT then -- Client-side only
         end
     end
 
+    local ConstraintAdmin = function(pnl)
+        log:debug("Setting up constraint admin to spawnmenu options...")
+        local ply = LocalPlayer()
+        if IsValid(ply) then
+            if ply:IsSuperAdmin() then -- Check if the player is a superadmin
+                log:info("Superadmin detected, adding superadmin-only constraint permission setting")
+                pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
+                pnl:CheckBox("Restrict to Super-Admins", vars.adminperm.name)
+            else
+                log:warn("Player does not have permission to modify constraint permissions")
+                pnl:Help("You do not have permission to change any settings.")
+            end
+        else
+            log:error("Player instance not found")
+        end
+    end
+
     -- Hooks
-    local hookFsc = function()
-        -- Hook spawnmenu to add the slider
-        spawnmenu.AddToolMenuOption("Utilities", "Admin", "FixedServerConstraintSettings", "Fix Constraint Limits", "", "", AdminConstraintSlider)
-        log:log("Hooked spawnmenu")
+    local hookOptions = function()
+        -- Hook spawnmenu to add the categories
+        spawnmenu.AddToolCategory("Options", "Constraints", "#Constraints")
+        log:print("Hooked spawnmenu categories")
+    end
+
+    local hookUtils = function()
+        -- Hook spawnmenu to add the settings
+        spawnmenu.AddToolMenuOption("Utilities", "Admin", "FSCsettings", "Fix Constraint Limits", "", "", ConstraintSettings)
+        spawnmenu.AddToolMenuOption("Options", "Constraints", "FSCadmin", "Admin", "", "", ConstraintAdmin)
+        log:print("Hooked spawnmenu settings")
         local ply = LocalPlayer()
         if IsValid(ply) then
             if ply:IsSuperAdmin() then
-                log:debug("Player", ply:Nick(), "is superadmin")
+                log:debug("Player", ply:Nick(), "is a superadmin")
             elseif ply:IsAdmin() then
-                log:debug("Player", ply:Nick(), "is admin")
+                log:debug("Player", ply:Nick(), "is an admin")
             else
-                log:debug("Player", ply:Nick(), "is nonadmin")
+                log:debug("Player", ply:Nick(), "is a nonadmin")
             end
         else
             log:error("Couldn't scan player's permissions early")
         end
     end
 
-    hook.Add("PopulateToolMenu", "AdminConstraintSettings", hookFsc)
-    net.Receive("FSC_ConstraintResetNotification", function()
+    hook.Add("AddToolMenuCategories", "ConstraintCategories", hookOptions)
+    hook.Add("PopulateToolMenu", "ConstraintSettings", hookUtils)
+    local notif = function()
         local msg = net.ReadString()
         local type = net.ReadUInt(8)
         local time = net.ReadFloat()
         notification.AddLegacy(msg, type, time)
         notify.sound(type)
-    end)
+    end
+
+    net.Receive("FSC_ConstraintResetNotification", notif)
 else
     log:error("Client instance not found")
     return

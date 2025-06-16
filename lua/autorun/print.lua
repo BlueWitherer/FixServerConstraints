@@ -20,7 +20,7 @@ local function consoleMsg(color, level, ...)
     MsgC(Color(255, 186, 245), "[FixServerConstraints] ", color, level .. ": ", msg .. "\n")
 end
 
-function FSCLogger:log(...)
+function FSCLogger:print(...)
     consoleMsg(Color(255, 255, 255), "LOG", ...)
 end
 

@@ -13,7 +13,7 @@ if SERVER then
     SetGlobal2Bool("welds_superadminonly", GetConVar("welds_superadminonly"):GetBool())
     local CVsuperPerm = GetConVar(superPerm)
     log:debug(CVsuperPerm:GetName(), CVsuperPerm:GetHelpText(), CVsuperPerm:GetBool(), CVsuperPerm:GetFlags())
-    log:log("Registered all convars")
+    log:print("Registered all convars")
     -- constraints
     log:info("Creating constraint limit convars...")
     local weldLimit = vars.maxwelds.name

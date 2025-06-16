@@ -12,29 +12,24 @@ if CLIENT then -- Client-side only
         log:debug("Checking if player has admin...")
         local ply = LocalPlayer()
         if IsValid(ply) then -- Check if player object is valid
-            local AdminVar = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
-            if AdminVar then -- Check that convar is loaded
-                if AdminVar:GetBool() then
-                    log:debug("Superadmin restriction is enabled, checking player status")
-                    if ply:IsSuperAdmin() then
-                        log:info("Player is a superadmin, permission granted")
-                        return true -- Superadmin has permission
-                    else
-                        log:warn("Player is not a superadmin, permission denied")
-                        return false -- Non-superadmin does not have permission
-                    end
+            local AdminBool = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
+            if AdminBool then
+                log:debug("Superadmin restriction is enabled, checking player status")
+                if ply:IsSuperAdmin() then
+                    log:info("Player is a superadmin, permission granted")
+                    return true -- Superadmin has permission
                 else
-                    if ply:IsAdmin() then
-                        log:info("Player is an admin, permission granted")
-                        return true -- Admin has permission
-                    else
-                        log:warn("Player is not an admin, permission denied")
-                        return false -- Non-admin does not have permission
-                    end
+                    log:warn("Player is not a superadmin, permission denied")
+                    return false -- Non-superadmin does not have permission
                 end
             else
-                log:error("Admin convar not found")
-                return false
+                if ply:IsAdmin() then
+                    log:info("Player is an admin, permission granted")
+                    return true -- Admin has permission
+                else
+                    log:warn("Player is not an admin, permission denied")
+                    return false -- Non-admin does not have permission
+                end
             end
         else
             log:error("Player instance not found")
@@ -69,15 +64,11 @@ if CLIENT then -- Client-side only
             else
                 log:warn("Player does not have permission to modify constraint limits")
                 local msgTxt = "you cannot change constraint limits." -- Help text
-                local AdminVar = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
-                if AdminVar then -- Check that convar is loaded
-                    if AdminVar:GetBool() then
-                        msgTxt = "please ask a superadmin to change constraint limits if you wish."
-                    else
-                        msgTxt = "if you wish to change constraint limits, please ask an admin or above."
-                    end
+                local AdminBool = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
+                if AdminBool then
+                    msgTxt = "please ask a superadmin to change constraint limits if you wish."
                 else
-                    log:error("Admin convar not found")
+                    msgTxt = "if you wish to change constraint limits, please ask an admin or above."
                 end
 
                 log:debug("Creating help text for player...")

@@ -96,11 +96,11 @@ if CLIENT then -- Client-side only
         local ply = LocalPlayer()
         if IsValid(ply) then
             if ply:IsSuperAdmin() then
-                log:debug("Player" .. ply:Nick() .. "is superadmin")
+                log:debug("Player", ply:Nick(), "is superadmin")
             elseif ply:IsAdmin() then
-                log:debug("Player" .. ply:Nick() .. "is admin")
+                log:debug("Player", ply:Nick(), "is admin")
             else
-                log:debug("Player" .. ply:Nick() .. "is nonadmin")
+                log:debug("Player", ply:Nick(), "is nonadmin")
             end
         else
             log:error("Couldn't scan player's permissions early")

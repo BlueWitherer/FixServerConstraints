@@ -22,7 +22,7 @@ This addon simply adds the missing ConVars needed to define weld and rope limits
 ### Configuration
 ###### Change options in the addon
 
-If you're an admin, you can find configurations in the spawnmenu in `Utilities` > `Admin` > `Fix Constraint Limits`. You may change the constraint and rope constraint limits. If you're a superadmin, you can find an option to restrict the ability to modify these limits strictly to superadmins, from regular admins.
+If you're an admin, you can find configurations in the spawnmenu in `Utilities` > `Admin` > `Fix Constraint Limits`. You may change the constraint and rope constraint limits. You can also find a button to reset all values to default. If you're a superadmin, you can find an option to restrict the ability to modify these limits strictly to superadmins, from regular admins.
 
 If you're the server operator, you can also type the following variables as commands in the console to modify them.
 

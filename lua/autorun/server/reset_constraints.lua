@@ -21,38 +21,56 @@ if SERVER then
     end
 
     net.Receive("FSC_ResetConstraintConVars", function(len, ply)
-        if not IsValid(ply) or not ply:IsSuperAdmin() then -- Only allow superadmins
+        if IsValid(ply) then
+            log:debug("Received request to reset constraint variables")
+            local AdminVar = GetConVar(vars.adminperm.name) -- Check if superadmin restriction is enabled
+            if AdminVar then
+                local adminBool = AdminVar:GetBool()
+                log:debug("Checking admin permission...")
+                if adminBool and ply:IsSuperAdmin() or not adminBool and ply:IsAdmin() then
+                    log:debug("Resetting constraint limits to default values...")
+                    -- Get convar names
+                    local weldLimit = vars.maxwelds.name
+                    local ropeLimit = vars.maxropes.name
+                    -- get convar objects
+                    local CVwelds = GetConVar(weldLimit)
+                    local CVropes = GetConVar(ropeLimit)
+                    local isError = false
+                    if CVwelds then
+                        CVwelds:Revert()
+                        log:info("Reset maximum welds")
+                    else
+                        isError = true
+                        log:error("Maximum welds convar not found")
+                    end
+
+                    if CVropes then
+                        CVropes:Revert()
+                        log:info("Reset maximum ropes")
+                    else
+                        isError = true
+                        log:error("Maximum ropes convar not found")
+                    end
+
+                    if isError then
+                        sendNotification(ply, "Couldn't find one or more constraint variables", notify.NOTIFY_ERROR, 3)
+                        return
+                    else
+                        sendNotification(ply, "Constraint limits reset to default!", notify.NOTIFY_GENERIC, 3)
+                        return
+                    end
+                else
+                    log:error("Player", ply:Nick(), "does not have required permission")
+                    sendNotification(ply, "You are missing permissions", notify.NOTIFY_ERROR, 3)
+                    return
+                end
+            else
+                log:error("Admin convar not found")
+                return
+            end
+        else
+            log:error("Player not found")
             return
-        end
-
-        log:debug("Resetting constraint limits to default values...")
-        -- Get convar names
-        local weldLimit = vars.maxwelds.name
-        local ropeLimit = vars.maxropes.name
-        -- get convar objects
-        local CVwelds = GetConVar(weldLimit)
-        local CVropes = GetConVar(ropeLimit)
-        local isError = false
-        if CVwelds then
-            CVwelds:Revert()
-            log:info("Reset maximum welds")
-        else
-            isError = true
-            log:error("Maximum welds convar not found")
-        end
-
-        if CVropes then
-            CVropes:Revert()
-            log:info("Reset maximum ropes")
-        else
-            isError = true
-            log:error("Maximum ropes convar not found")
-        end
-
-        if isError then
-            sendNotification(ply, "Couldn't find one or more constraint variables.", notify.NOTIFY_ERROR, 3)
-        else
-            sendNotification(ply, "Constraint limits reset to default!", notify.NOTIFY_GENERIC, 3)
         end
     end)
 else

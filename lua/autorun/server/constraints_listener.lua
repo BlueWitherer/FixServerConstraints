@@ -15,9 +15,15 @@ if SERVER then
     util.AddNetworkString("FSC_ConstraintResetNotification")
     -- admin check
     local function checkAdmin(ply)
-        local adminBool = AdminVar:GetBool()
-        log:debug("Checking admin permission...")
-        return adminBool and ply:IsSuperAdmin() or not adminBool and ply:IsAdmin()
+        local AdminVar = GetConVar(vars.adminperm.name)
+        if AdminVar then
+            local adminBool = AdminVar:GetBool()
+            log:debug("Checking admin permission...")
+            return adminBool and ply:IsSuperAdmin() or not adminBool and ply:IsAdmin()
+        else
+            log:error("Admin convar not found")
+            return false
+        end
     end
 
     -- client notifs

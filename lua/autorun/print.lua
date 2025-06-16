@@ -1,4 +1,11 @@
-local printFormat = function(...)
+local FSCLogger = {}
+FSCLogger.__index = FSCLogger
+function FSCLogger:new()
+    local obj = setmetatable({}, self)
+    return obj
+end
+
+local function formatMsg(...)
     local args = {...}
     local msg = ""
     for i, v in ipairs(args) do
@@ -8,15 +15,28 @@ local printFormat = function(...)
     return msg
 end
 
-local consoleMsg = function(color, tag, ...)
-    local msg = printFormat(...)
-    return MsgC(Color(255, 186, 245), "[FixServerConstraints] ", color, tag .. ": ", msg .. "\n")
+local function consoleMsg(color, level, ...)
+    local msg = formatMsg(...)
+    MsgC(Color(255, 186, 245), "[FixServerConstraints] ", color, level .. ": ", msg .. "\n")
 end
 
-FscPrint = {
-    log = function(...) return consoleMsg(Color(255, 255, 255), "LOG", ...) end,
-    debug = function(...) return consoleMsg(Color(136, 136, 136), "DEBUG", ...) end,
-    info = function(...) return consoleMsg(Color(119, 182, 255), "INFO", ...) end,
-    warn = function(...) return consoleMsg(Color(255, 244, 159), "WARN", ...) end,
-    error = function(...) return consoleMsg(Color(255, 103, 103), "ERROR", ...) end
-}
+function FSCLogger:log(...)
+    consoleMsg(Color(255, 255, 255), "LOG", ...)
+end
+
+function FSCLogger:debug(...)
+    consoleMsg(Color(136, 136, 136), "DEBUG", ...)
+end
+
+function FSCLogger:info(...)
+    consoleMsg(Color(119, 182, 255), "INFO", ...)
+end
+
+function FSCLogger:warn(...)
+    consoleMsg(Color(255, 244, 159), "WARN", ...)
+end
+
+function FSCLogger:error(...)
+    consoleMsg(Color(255, 103, 103), "ERROR", ...)
+end
+return FSCLogger

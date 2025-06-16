@@ -1,4 +1,4 @@
-# <img src="logo.jpg" width="30" alt="The addon's logo." /> Fix Server Constraints Limit
+# <img src="addon.jpg" width="30" alt="The addon's logo." /> Fix Server Constraints Limit
 Fix constraint limits for your dedicated Garry's Mod server.
 
 > [<img alt="Updated" src="https://img.shields.io/steam/update-date/3497996983?style=for-the-badge&logo=github&logoColor=ffffff&label=Updated">](https://steamcommunity.com/sharedfiles/filedetails/changelog/3497996983)    [<img alt="Code License" src="https://img.shields.io/github/license/BlueWitherer/FixServerConstraints?style=for-the-badge&logo=gnu&logoColor=ffffff&label=License">](LICENSE.md)

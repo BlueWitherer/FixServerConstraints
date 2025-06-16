@@ -1,6 +1,6 @@
 {
-    "title": "Fix Server Constraints",
-    "description": "Fix the weld and rope constraint limit on your Garry's Mod server.",
+    "title": "Fix Server Constraints Limit",
+    "description": "Fix constraint limits for your dedicated Garry's Mod server.",
     "type": "servercontent",
     "tags": [
         "fun"

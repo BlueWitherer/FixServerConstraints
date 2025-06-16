@@ -22,7 +22,7 @@ if SERVER then
 
     net.Receive("FSC_ResetConstraintConVars", function(len, ply)
         if IsValid(ply) then
-            log:debug("Received request to reset constraint variables")
+            log:info("Received request to reset constraint variables")
             local AdminVar = GetConVar(vars.adminperm.name) -- Check if superadmin restriction is enabled
             if AdminVar then
                 local adminBool = AdminVar:GetBool()

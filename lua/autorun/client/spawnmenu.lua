@@ -4,6 +4,8 @@ if CLIENT then -- Client-side only
     local log = FSCLogger:new()
     -- convars
     local vars = include("autorun/vars.lua")
+    -- notifs
+    local notify = include("autorun/notify.lua")
     -- functions
     local CheckAdmin = function()
         -- Check if the player has permission to modify constraint limits
@@ -111,6 +113,7 @@ if CLIENT then -- Client-side only
         local type = net.ReadUInt(8)
         local time = net.ReadFloat()
         notification.AddLegacy(msg, type, time)
+        notify.sound(type)
     end)
 else
     log:error("Client instance not found")

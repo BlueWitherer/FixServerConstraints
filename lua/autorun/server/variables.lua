@@ -22,10 +22,7 @@ if SERVER then
     CreateConVar(superPerm, 1, FCVAR_ARCHIVE + FCVAR_REPLICATED, "Restrict constraint limit modifications to superadmins only")
     local CVsuperPerm = GetConVar(superPerm)
     log:debug(CVsuperPerm:GetName(), CVsuperPerm:GetHelpText(), CVsuperPerm:GetBool(), CVsuperPerm:GetFlags())
-    -- testing
-    log:debug("Creating debug convar...")
-    CreateConVar("test_cheeseworks", 65, FCVAR_ARCHIVE, "Cheeseworks test convar")
-    log:log("Created all convars for constraint limit addon!")
+    log:log("Registered all convars")
 else
     log:error("Server instance not found")
     return

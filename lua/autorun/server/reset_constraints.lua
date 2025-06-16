@@ -50,9 +50,9 @@ if SERVER then
         end
 
         if isError then
-            sendNotification(ply, "Couldn't find one or more constraint variables", notify.NOTIFY_ERROR, 3)
+            sendNotification(ply, "Couldn't find one or more constraint variables.", notify.NOTIFY_ERROR, 3)
         else
-            sendNotification(ply, "Constraint limits reset to default", notify.NOTIFY_GENERIC, 3)
+            sendNotification(ply, "Constraint limits reset to default!", notify.NOTIFY_GENERIC, 3)
         end
     end)
 else

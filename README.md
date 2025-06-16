@@ -20,6 +20,7 @@ This addon simply adds the missing ConVars needed to define weld and rope limits
 ---
 
 ### Configuration
+###### Change options in the addon
 
 If you're an admin, you can find configurations in the spawnmenu in `Utilities` > `Admin` > `Fix Constraint Limits`. You may change the constraint and rope constraint limits. If you're a superadmin, you can find an option to restrict the ability to modify these limits strictly to superadmins, from regular admins.
 
@@ -30,4 +31,5 @@ If you're the server operator, you can also type the following variables as comm
 |   **`sbox_maxconstraints`**   | Maximum weld limit                      | `2000`  |
 | **`sbox_maxropeconstraints`** | Maximum rope limit                      | `1000`  |
 |    `welds_superadminonly`     | Only allow superadmins to change limits |   `1`   |
+
 Format: `variable_name {number}`

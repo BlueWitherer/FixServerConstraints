@@ -45,8 +45,22 @@ if CLIENT then -- Client-side only
             if CheckAdmin() then -- Check for admin
                 log:info("Player has permission to modify constraint limits")
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
-                pnl:NumSlider("Max Constraints", vars.maxwelds.name, 100, 2000, 0)
-                pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 100, 2000, 0)
+                local weldSlider = pnl:NumSlider("Max Constraints", vars.maxwelds.name, 100, 2000, 0)
+                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 100, 2000, 0)
+                weldSlider.OnValueChanged = function(_, value)
+                    net.Start("FSC_SetConstraintConVar")
+                    net.WriteString(vars.maxwelds.name)
+                    net.WriteFloat(value)
+                    net.SendToServer()
+                end
+
+                ropeSlider.OnValueChanged = function(_, value)
+                    net.Start("FSC_SetConstraintConVar")
+                    net.WriteString(vars.maxropes.name)
+                    net.WriteFloat(value)
+                    net.SendToServer()
+                end
+
                 local ResetBtn = pnl:Button("Reset to default")
                 ResetBtn.DoClick = function()
                     log:debug("Sending request to server...")
@@ -116,6 +130,7 @@ if CLIENT then -- Client-side only
 
     hook.Add("AddToolMenuCategories", "ConstraintCategories", hookOptions)
     hook.Add("PopulateToolMenu", "ConstraintSettings", hookUtils)
+    -- Events
     local notif = function()
         local msg = net.ReadString()
         local type = net.ReadUInt(8)

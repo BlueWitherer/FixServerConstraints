@@ -73,6 +73,12 @@ if SERVER then
             return
         end
     end)
+
+    cvars.AddChangeCallback("welds_superadminonly", function(name, old, new)
+        log:debug("Detected change in superadmin permission convar...")
+        SetGlobal2Bool("welds_superadminonly", tobool(new)) -- Sync change globally
+        log:debug("Synced superadmin permission convar with all clients")
+    end)
 else
     log:error("Server instance not found")
     return

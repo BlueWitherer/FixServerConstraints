@@ -6,6 +6,14 @@ if SERVER then
     -- convars
     AddCSLuaFile("autorun/vars.lua")
     local vars = include("autorun/vars.lua")
+    -- permissions
+    log:info("Creating constraint permission convar...")
+    local superPerm = vars.adminperm.name
+    CreateConVar(superPerm, 1, FCVAR_ARCHIVE + FCVAR_REPLICATED, "Restrict constraint limit modifications to superadmins only")
+    SetGlobal2Bool("welds_superadminonly", GetConVar("welds_superadminonly"):GetBool())
+    local CVsuperPerm = GetConVar(superPerm)
+    log:debug(CVsuperPerm:GetName(), CVsuperPerm:GetHelpText(), CVsuperPerm:GetBool(), CVsuperPerm:GetFlags())
+    log:log("Registered all convars")
     -- constraints
     log:info("Creating constraint limit convars...")
     local weldLimit = vars.maxwelds.name
@@ -16,13 +24,6 @@ if SERVER then
     local CVropeLimit = GetConVar(ropeLimit)
     log:debug(CVweldLimit:GetName(), CVweldLimit:GetHelpText(), CVweldLimit:GetInt(), CVweldLimit:GetFlags())
     log:debug(CVropeLimit:GetName(), CVropeLimit:GetHelpText(), CVropeLimit:GetInt(), CVropeLimit:GetFlags())
-    -- permissions
-    log:info("Creating constraint permission convar...")
-    local superPerm = vars.adminperm.name
-    CreateConVar(superPerm, 1, FCVAR_ARCHIVE + FCVAR_REPLICATED, "Restrict constraint limit modifications to superadmins only")
-    local CVsuperPerm = GetConVar(superPerm)
-    log:debug(CVsuperPerm:GetName(), CVsuperPerm:GetHelpText(), CVsuperPerm:GetBool(), CVsuperPerm:GetFlags())
-    log:log("Registered all convars")
 else
     log:error("Server instance not found")
     return

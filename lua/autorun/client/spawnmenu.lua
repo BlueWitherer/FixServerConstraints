@@ -12,7 +12,7 @@ if CLIENT then -- Client-side only
         log:debug("Checking if player has admin...")
         local ply = LocalPlayer()
         if IsValid(ply) then -- Check if player object is valid
-            local AdminVar = GetConVar(vars.adminperm.name) -- Check if superadmin restriction is enabled
+            local AdminVar = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
             if AdminVar then -- Check that convar is loaded
                 if AdminVar:GetBool() then
                     log:debug("Superadmin restriction is enabled, checking player status")
@@ -69,7 +69,7 @@ if CLIENT then -- Client-side only
             else
                 log:warn("Player does not have permission to modify constraint limits")
                 local msgTxt = "you cannot change constraint limits." -- Help text
-                local AdminVar = GetConVar(vars.adminperm.name) -- Check if superadmin restriction is enabled
+                local AdminVar = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
                 if AdminVar then -- Check that convar is loaded
                     if AdminVar:GetBool() then
                         msgTxt = "please ask a superadmin to change constraint limits if you wish."

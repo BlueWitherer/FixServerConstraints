@@ -12,4 +12,9 @@ local vars = {
         default = 1
     }
 }
+
+vars.validVars = {
+    [vars.maxwelds.name] = true,
+    [vars.maxropes.name] = true
+}
 return vars

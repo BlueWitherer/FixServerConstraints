@@ -23,7 +23,7 @@ if CLIENT then -- Client-side only
                     return false -- Non-superadmin does not have permission
                 end
             else
-                if ply:IsAdmin() then
+                if ply:IsAdmin() or plr:IsSuperAdmin() then
                     log:info("Player is an admin, permission granted")
                     return true -- Admin has permission
                 else

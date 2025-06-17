@@ -41,11 +41,26 @@ if SERVER then
             if checkAdmin(ply) then
                 local cvar = net.ReadString()
                 local value = net.ReadFloat()
-                if cvar == "sbox_maxconstraints" or cvar == "sbox_maxropeconstraints" then RunConsoleCommand(cvar, tostring(math.floor(value))) end
+                log:debug("Checking if convar is valid...")
+                if vars.validVars[cvar] then
+                    local var = GetConVar(cvar)
+                    if var then
+                        var:SetFloat(value)
+                    else
+                        log:error("Convar", cvar, "not found")
+                        return
+                    end
+                else
+                    log:error("Attempted to modify an unrelated convar")
+                    return
+                end
             else
                 log:error("Player", ply:Nick(), "does not have required permission")
                 return
             end
+        else
+            log:error("Player not found")
+            return
         end
     end)
 

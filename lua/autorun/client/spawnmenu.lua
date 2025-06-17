@@ -47,6 +47,16 @@ if CLIENT then -- Client-side only
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
                 local weldSlider = pnl:NumSlider("Max Constraints", nil, 100, 2000, 0)
                 local ropeSlider = pnl:NumSlider("Max Rope Constraints", nil, 100, 2000, 0)
+                local weldV = GetConVar(vars.maxwelds.name) -- Get the current max welds value
+                local ropeV = GetConVar(vars.maxropes.name) -- Get the current max ropes value
+                if weldV and ropeV then
+                    log:debug("Current max welds:", weldV:GetInt(), "Current max ropes:", ropeV:GetInt())
+                    weldSlider:SetValue(weldV:GetFloat()) -- Set the slider value to the current max welds
+                    ropeSlider:SetValue(ropeV:GetFloat()) -- Set the slider value to the current max ropes
+                else
+                    log:error("Failed to retrieve current constraint values")
+                end
+
                 weldSlider.OnValueChanged = function(_, value)
                     -- Slider value changed callback
                     log:debug("Weld slider value changed to", value)
@@ -98,6 +108,8 @@ if CLIENT then -- Client-side only
                 log:info("Superadmin detected, adding superadmin-only constraint permission setting")
                 pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
                 local adminCheckBox = pnl:CheckBox("Restrict to Super-Admins", nil)
+                local adminV = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
+                adminCheckBox:SetValue(adminV) -- Set checkbox to current value
                 adminCheckBox.OnChange = function(_, value)
                     -- Checkbox value changed callback
                     log:debug("Admin checkbox changed to", value)

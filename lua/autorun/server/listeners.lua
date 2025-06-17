@@ -93,15 +93,15 @@ if SERVER then
                 end
 
                 if isError then
-                    sendNotification(ply, "Couldn't find one or more constraint variables", notify.NOTIFY_ERROR, 3)
+                    sendNotification(ply, "Couldn't find one or more constraint variables", notify.enum.NOTIFY_ERROR, 3)
                     return
                 else
-                    sendNotification(ply, "Constraint limits reset to default!", notify.NOTIFY_GENERIC, 3)
+                    sendNotification(ply, "Constraint limits reset to default!", notify.enum.NOTIFY_UNDO, 3)
                     return
                 end
             else
                 log:error("Player", ply:Nick(), "does not have required permission")
-                sendNotification(ply, "You are missing permissions", notify.NOTIFY_ERROR, 3)
+                sendNotification(ply, "You are missing permissions", notify.enum.NOTIFY_ERROR, 3)
                 return
             end
         else

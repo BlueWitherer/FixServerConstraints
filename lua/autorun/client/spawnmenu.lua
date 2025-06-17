@@ -45,9 +45,11 @@ if CLIENT then -- Client-side only
             if CheckAdmin() then -- Check for admin
                 log:info("Player has permission to modify constraint limits")
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
-                local weldSlider = pnl:NumSlider("Max Constraints", vars.maxwelds.name, 100, 2000, 0)
-                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 100, 2000, 0)
+                local weldSlider = pnl:NumSlider("Max Constraints", nil, 100, 2000, 0)
+                local ropeSlider = pnl:NumSlider("Max Rope Constraints", nil, 100, 2000, 0)
                 weldSlider.OnValueChanged = function(_, value)
+                    -- Slider value changed callback
+                    log:debug("Weld slider value changed to", value)
                     net.Start("FSC_SetConstraintConVar")
                     net.WriteString(vars.maxwelds.name)
                     net.WriteFloat(value)
@@ -55,6 +57,8 @@ if CLIENT then -- Client-side only
                 end
 
                 ropeSlider.OnValueChanged = function(_, value)
+                    -- Slider value changed callback
+                    log:debug("Rope slider value changed to", value)
                     net.Start("FSC_SetConstraintConVar")
                     net.WriteString(vars.maxropes.name)
                     net.WriteFloat(value)
@@ -63,7 +67,8 @@ if CLIENT then -- Client-side only
 
                 local ResetBtn = pnl:Button("Reset to default")
                 ResetBtn.DoClick = function()
-                    log:debug("Sending request to server...")
+                    -- Reset button clicked callback
+                    log:debug("Reset button clicked, resetting constraint limits to default")
                     net.Start("FSC_ResetConstraintConVars")
                     net.SendToServer()
                 end
@@ -92,7 +97,15 @@ if CLIENT then -- Client-side only
             if ply:IsSuperAdmin() then -- Check if the player is a superadmin
                 log:info("Superadmin detected, adding superadmin-only constraint permission setting")
                 pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
-                pnl:CheckBox("Restrict to Super-Admins", vars.adminperm.name)
+                local adminCheckBox = pnl:CheckBox("Restrict to Super-Admins", nil)
+                adminCheckBox.OnChange = function(_, value)
+                    -- Checkbox value changed callback
+                    log:debug("Admin checkbox changed to", value)
+                    net.Start("FSC_SetConstraintAdmin")
+                    net.WriteString(vars.adminperm.name)
+                    net.WriteFloat(value and 1 or 0)
+                    net.SendToServer()
+                end
             else
                 log:warn("Player does not have permission to modify constraint permissions")
                 pnl:Help("You do not have permission to change any settings.")

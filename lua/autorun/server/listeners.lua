@@ -12,6 +12,7 @@ if SERVER then
     -- event listerners
     util.AddNetworkString("FSC_SetConstraintConVar")
     util.AddNetworkString("FSC_ResetConstraintConVars")
+    util.AddNetworkString("FSC_SetConstraintAdmin")
     util.AddNetworkString("FSC_ConstraintResetNotification")
     -- admin check
     local function checkAdmin(ply)
@@ -102,6 +103,32 @@ if SERVER then
             else
                 log:error("Player", ply:Nick(), "does not have required permission")
                 sendNotification(ply, "You are missing permissions", notify.enum.NOTIFY_ERROR, 3)
+                return
+            end
+        else
+            log:error("Player not found")
+            return
+        end
+    end)
+
+    net.Receive("FSC_SetConstraintAdmin", function(len, ply)
+        if IsValid(ply) then
+            log:info("Received request to set superadmin permission convar")
+            if checkAdmin(ply) then
+                local newValue = net.ReadBool()
+                log:debug("Setting superadmin permission convar to", newValue)
+                local superPerm = vars.adminperm.name
+                local CVsuperPerm = GetConVar(superPerm)
+                if CVsuperPerm then
+                    CVsuperPerm:SetBool(newValue)
+                    SetGlobal2Bool("welds_superadminonly", newValue) -- Sync change globally
+                    log:debug("Synced superadmin permission convar with all clients")
+                else
+                    log:error("Superadmin permission convar not found")
+                    return
+                end
+            else
+                log:error("Player", ply:Nick(), "does not have required permission")
                 return
             end
         else

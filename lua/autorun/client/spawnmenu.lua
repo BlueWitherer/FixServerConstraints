@@ -37,6 +37,15 @@ if CLIENT then -- Client-side only
         end
     end
 
+    local SendVarUpdate = function(cvar, value)
+        -- Send a convar update to the server
+        log:debug("Sending convar update to server for", cvar, "with value", value)
+        net.Start("FSC_SetConstraintConVar")
+        net.WriteString(cvar)
+        net.WriteFloat(value)
+        net.SendToServer()
+    end
+
     local ConstraintSettings = function(pnl)
         -- Add a slider to update constraint limits
         log:debug("Setting up constraint limit sliders to spawnmenu utilities...")
@@ -45,37 +54,21 @@ if CLIENT then -- Client-side only
             if CheckAdmin() then -- Check for admin
                 log:info("Player has permission to modify constraint limits")
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
-                local weldSlider = pnl:NumSlider("Max Constraints", nil, 100, 2000, 0)
-                local ropeSlider = pnl:NumSlider("Max Rope Constraints", nil, 100, 2000, 0)
-                local weldV = GetConVar(vars.maxwelds.name) -- Get the current max welds value
-                local ropeV = GetConVar(vars.maxropes.name) -- Get the current max ropes value
-                if weldV and ropeV then
-                    log:debug("Current max welds:", weldV:GetInt(), "Current max ropes:", ropeV:GetInt())
-                    weldSlider:SetValue(weldV:GetFloat()) -- Set the slider value to the current max welds
-                    ropeSlider:SetValue(ropeV:GetFloat()) -- Set the slider value to the current max ropes
-                else
-                    log:error("Failed to retrieve current constraint values")
+                local weldSlider = pnl:NumSlider("Max Constraints", vars.maxwelds.name, 10, 2000, 0)
+                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 10, 2000, 0)
+                pnl:Help("If you're on a server, you likely cannot update the values as you adjust the slider. To fix this, press the button below to manually update the constraint limits. This is not required if you're hosting this server on your computer.")
+                local UpdateBtn = pnl:Button("Update Limits")
+                UpdateBtn.DoClick = function()
+                    -- Update button clicked callback
+                    log:debug("Update button clicked, sending new constraint limits to server")
+                    local weldValue = weldSlider:GetValue()
+                    local ropeValue = ropeSlider:GetValue()
+                    SendVarUpdate(vars.maxwelds.name, weldValue)
+                    SendVarUpdate(vars.maxropes.name, ropeValue)
                 end
 
-                weldSlider.OnValueChanged = function(_, value)
-                    -- Slider value changed callback
-                    log:debug("Weld slider value changed to", value)
-                    net.Start("FSC_SetConstraintConVar")
-                    net.WriteString(vars.maxwelds.name)
-                    net.WriteFloat(value)
-                    net.SendToServer()
-                end
-
-                ropeSlider.OnValueChanged = function(_, value)
-                    -- Slider value changed callback
-                    log:debug("Rope slider value changed to", value)
-                    net.Start("FSC_SetConstraintConVar")
-                    net.WriteString(vars.maxropes.name)
-                    net.WriteFloat(value)
-                    net.SendToServer()
-                end
-
-                local ResetBtn = pnl:Button("Reset to default")
+                pnl:Help("Reset the constraint limits to their default values.")
+                local ResetBtn = pnl:Button("Reset to Default")
                 ResetBtn.DoClick = function()
                     -- Reset button clicked callback
                     log:debug("Reset button clicked, resetting constraint limits to default")
@@ -97,6 +90,7 @@ if CLIENT then -- Client-side only
             end
         else
             log:error("Player instance not found")
+            return
         end
     end
 
@@ -107,9 +101,7 @@ if CLIENT then -- Client-side only
             if ply:IsSuperAdmin() then -- Check if the player is a superadmin
                 log:info("Superadmin detected, adding superadmin-only constraint permission setting")
                 pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
-                local adminCheckBox = pnl:CheckBox("Restrict to Super-Admins", nil)
-                local adminV = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
-                adminCheckBox:SetValue(adminV) -- Set checkbox to current value
+                local adminCheckBox = pnl:CheckBox("Restrict to Super-Admins", vars.adminperm.name)
                 adminCheckBox.OnChange = function(_, value)
                     -- Checkbox value changed callback
                     log:debug("Admin checkbox changed to", value)
@@ -124,6 +116,7 @@ if CLIENT then -- Client-side only
             end
         else
             log:error("Player instance not found")
+            return
         end
     end
 

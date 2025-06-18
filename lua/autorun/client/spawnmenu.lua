@@ -1,4 +1,7 @@
 if CLIENT then -- Client-side only
+    -- settings
+    local notificationsVarString = "fsc_enable_notifications"
+    CreateClientConVar(notificationsVarString, "1", true, false, "Enable FixServerConstraints notifications")
     -- logging
     local FSCLogger = include("autorun/print.lua")
     local log = FSCLogger:new()
@@ -47,8 +50,8 @@ if CLIENT then -- Client-side only
             if CheckAdmin() then -- Check for admin
                 log:info("Player has permission to modify constraint limits")
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
-                local weldSlider = pnl:NumSlider("Max Constraints", vars.maxwelds.name, 10, 2000, 0)
-                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 10, 2000, 0)
+                local weldSlider = pnl:NumSlider("Max Constraints", vars.maxwelds.name, 10, vars.maxwelds.default, 0)
+                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 10, vars.maxropes.default, 0)
                 pnl:Help("If you're on a server, you likely cannot update the values in realtime as you adjust the slider. To fix this, press the button below to manually update the constraint limits. This is not required if you're hosting this server on your computer.")
                 local UpdateBtn = pnl:Button("Update Limits")
                 UpdateBtn.DoClick = function()
@@ -93,6 +96,20 @@ if CLIENT then -- Client-side only
                 log:debug("Creating help text for player...")
                 pnl:Help("You're a player, " .. msgTxt)
             end
+        else
+            log:error("Player instance not found")
+            return
+        end
+    end
+
+    local ConstraintClient = function(pnl)
+        log:debug("Setting up constraint client to spawnmenu options...")
+        local ply = LocalPlayer()
+        if IsValid(ply) then
+            log:debug("Player", ply:Nick(), "is valid, checking permissions...")
+            pnl:Help("Adjust this addon's settings.")
+            pnl:CheckBox("Enable Notifications", notificationsVarString)
+            pnl:Help("Toggle display of all notifications on client. If disabled, you will only see notifications logged in the console.")
         else
             log:error("Player instance not found")
             return
@@ -144,6 +161,7 @@ if CLIENT then -- Client-side only
     local hookUtils = function()
         -- Hook spawnmenu to add the settings
         spawnmenu.AddToolMenuOption("Utilities", "Admin", "FSCsettings", "Fix Constraint Limits", "", "", ConstraintSettings)
+        spawnmenu.AddToolMenuOption("Options", "Constraints", "FSCclient", "Client", "", "", ConstraintClient)
         spawnmenu.AddToolMenuOption("Options", "Constraints", "FSCadmin", "Admin", "", "", ConstraintAdmin)
         log:print("Hooked spawnmenu settings")
         local ply = LocalPlayer()
@@ -165,11 +183,24 @@ if CLIENT then -- Client-side only
     hook.Add("PopulateToolMenu", "ConstraintSettings", hookUtils)
     -- Events
     local notif = function()
-        local msg = net.ReadString()
-        local type = net.ReadUInt(8)
-        local time = net.ReadFloat()
-        notification.AddLegacy(msg, type, time)
-        notify.sound(type)
+        local ifNotifs = GetConVar(notificationsVarString)
+        if ifNotifs then
+            log:debug("Checking notification convar...")
+            if ifNotifs:GetBool() then
+                local msg = net.ReadString()
+                local type = net.ReadUInt(8)
+                local time = net.ReadFloat()
+                log:debug("Displaying notification for", msg, "of type", type, "for time", time)
+                notification.AddLegacy(msg, type, time)
+                notify.sound(type)
+            else
+                log:debug("Notifications are disabled, skipping notification display for", msg, "of type", type, "for time", time)
+                return
+            end
+        else
+            log:error("Notification convar not found, cannot display notifications")
+            return
+        end
     end
 
     net.Receive("FSC_ConstraintResetNotification", notif)

@@ -102,13 +102,14 @@ if CLIENT then -- Client-side only
                 log:info("Superadmin detected, adding superadmin-only constraint permission setting")
                 pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
                 local adminCheckBox = pnl:CheckBox("Restrict to Super-Admins", vars.adminperm.name)
-                adminCheckBox.OnChange = function(_, value)
-                    -- Checkbox value changed callback
-                    log:debug("Admin checkbox changed to", value)
-                    net.Start("FSC_SetConstraintAdmin")
-                    net.WriteString(vars.adminperm.name)
-                    net.WriteFloat(value and 1 or 0)
-                    net.SendToServer()
+                pnl:Help("Press this button if you're not hosting this server to update permissions.")
+                local UpdateBtn = pnl:Button("Update Permission")
+                UpdateBtn.DoClick = function()
+                    -- Update button clicked callback
+                    log:debug("Update button pressed, sending superadmin restriction update to server")
+                    local isChecked = adminCheckBox:GetChecked()
+                    log:info("Superadmin restriction is now", isChecked and "enabled" or "disabled")
+                    SendVarUpdate(vars.adminperm.name, isChecked and 1 or 0)
                 end
             else
                 log:warn("Player does not have permission to modify constraint permissions")

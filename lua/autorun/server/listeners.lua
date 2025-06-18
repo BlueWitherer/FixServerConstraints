@@ -15,7 +15,8 @@ if SERVER then
     util.AddNetworkString("FSC_SetConstraintAdmin")
     util.AddNetworkString("FSC_ConstraintResetNotification")
     -- admin check
-    local function checkAdmin(ply)
+    local function checkAdmin(ply) -- Check if the player has permission to modify constraint limits
+        log:debug("Checking if player has admin...")
         local AdminVar = GetConVar(vars.adminperm.name)
         if AdminVar then
             local adminBool = AdminVar:GetBool()
@@ -28,7 +29,8 @@ if SERVER then
     end
 
     -- client notifs
-    local function sendNotification(ply, msg, type, time)
+    local function sendNotification(ply, msg, type, time) -- Send a notification to the client
+        log:debug("Sending notification to player", ply:Nick(), "with message:", msg, "type:", type, "time:", time)
         net.Start("FSC_ConstraintResetNotification")
         net.WriteString(msg)
         net.WriteUInt(type, 8)
@@ -37,16 +39,20 @@ if SERVER then
     end
 
     net.Receive("FSC_SetConstraintConVar", function(len, ply)
+        -- Handle client requests to modify constraint variables
+        log:info("Received request to modify constraint variables")
         if IsValid(ply) then
-            log:info("Received request to reset constraint variables")
+            log:debug("Player", ply:Nick(), "is valid, checking permissions...")
             if checkAdmin(ply) then
+                log:debug("Player", ply:Nick(), "has required permission, processing request...")
                 local cvar = net.ReadString()
                 local value = net.ReadFloat()
-                log:debug("Checking if convar is valid...")
                 if vars.validVars[cvar] then
+                    log:debug("Convar", cvar, "is valid, setting value to", value)
                     local var = GetConVar(cvar)
                     if var then
                         var:SetFloat(value)
+                        log:info("Set convar", cvar, "to", value)
                     else
                         log:error("Convar", cvar, "not found")
                         return
@@ -66,6 +72,7 @@ if SERVER then
     end)
 
     net.Receive("FSC_ResetConstraintConVars", function(len, ply)
+        -- Handle client requests to reset constraint variables
         if IsValid(ply) then
             log:info("Received request to reset constraint variables")
             if checkAdmin(ply) then
@@ -112,6 +119,7 @@ if SERVER then
     end)
 
     net.Receive("FSC_SetConstraintAdmin", function(len, ply)
+        -- Handle client requests to set superadmin permission convar
         if IsValid(ply) then
             log:info("Received request to set superadmin permission convar")
             if checkAdmin(ply) then
@@ -138,6 +146,7 @@ if SERVER then
     end)
 
     cvars.AddChangeCallback("welds_superadminonly", function(name, old, new)
+        -- Callback for superadmin permission convar changes
         log:debug("Detected change in superadmin permission convar...")
         SetGlobal2Bool("welds_superadminonly", tobool(new)) -- Sync change globally
         log:debug("Synced superadmin permission convar with all clients")

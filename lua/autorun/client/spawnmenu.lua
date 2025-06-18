@@ -63,8 +63,10 @@ if CLIENT then -- Client-side only
                     log:debug("Update button clicked, sending new constraint limits to server")
                     local weldValue = weldSlider:GetValue()
                     local ropeValue = ropeSlider:GetValue()
-                    SendVarUpdate(vars.maxwelds.name, weldValue)
-                    SendVarUpdate(vars.maxropes.name, ropeValue)
+                    net.Start("FSC_SetConstraintConVars")
+                    net.WriteFloat(weldValue)
+                    net.WriteFloat(ropeValue)
+                    net.SendToServer()
                 end
 
                 pnl:Help("Reset the constraint limits to their default values.")

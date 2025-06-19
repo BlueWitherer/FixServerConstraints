@@ -6,6 +6,7 @@ if CLIENT then
     local vars = include("autorun/vars.lua")
     -- notifs
     local notify = include("autorun/notify.lua")
+    -- notification handler
     local function notif()
         -- Function to handle constraint reset notifications
         log:info("Received constraint reset notification from server")

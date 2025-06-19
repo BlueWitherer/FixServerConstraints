@@ -181,6 +181,8 @@ if CLIENT then -- Client-side only
         end
     end
 
+    -- Register hooks
+    log:debug("Registering hooks for spawnmenu...")
     hook.Add("AddToolMenuCategories", "ConstraintCategories", hookOptions)
     hook.Add("PopulateToolMenu", "ConstraintSettings", hookUtils)
 else

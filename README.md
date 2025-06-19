@@ -5,7 +5,10 @@ Fix constraint limits for your dedicated Garry's Mod server.
 >  
 > [<img alt="Downloads" src="https://img.shields.io/steam/downloads/3497996983?style=for-the-badge&logo=steam&logoColor=ffffff&label=Downloads">](https://steamcommunity.com/sharedfiles/filedetails/?id=3497996983)
 
-Can't use ropes or welds on your dedicated server? Don't worry! This addon simply fixes that!
+Can't use ropes or welds on your dedicated server? Don't worry! This addon fixes that, and makes it easy to manage!
+
+> [!TIP]
+> *This addon has settings you can utilize to customize your experience.*
 
 ---
 

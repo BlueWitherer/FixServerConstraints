@@ -108,7 +108,7 @@ if CLIENT then -- Client-side only
             log:debug("Player", ply:Nick(), "is valid, checking permissions...")
             pnl:Help("Adjust this addon's settings.")
             pnl:CheckBox("Enable Notifications", vars.client.notifs.name)
-            pnl:Help("Toggle display of all notifications on client. If disabled, you will only see notifications logged in the console.")
+            pnl:Help("Toggle display of all notifications on your client. If disabled, you will only see notifications logged in the console.")
         else
             log:error("Player instance not found")
             return

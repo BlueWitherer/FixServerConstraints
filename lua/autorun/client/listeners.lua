@@ -21,7 +21,7 @@ if CLIENT then
                 notification.AddLegacy(msg, type, time)
                 notify.sound(type)
             else
-                log:debug("Notifications are disabled, skipping notification display for", msg, "of type", type, "for time", time)
+                log:debug("Skipping notification display for", msg, "of type", type, "for time", time)
                 return
             end
         else

@@ -8,7 +8,7 @@ if CLIENT then
     -- settings
     log:info("Creating client settings convars...")
     local showNotifs = vars.client.notifs.name
-    local CVshowNotifs = CreateClientConVar(showNotifs, "1", true, false, "Enable FixServerConstraints notifications", 0, 1)
+    local CVshowNotifs = CreateClientConVar(showNotifs, vars.client.notifs.default, true, false, "Enable FixServerConstraints client notifications", 0, 1)
     log:debug(CVshowNotifs:GetName(), CVshowNotifs:GetHelpText(), CVshowNotifs:GetBool(), CVshowNotifs:GetFlags())
     log:print("Registered all client convars")
 else

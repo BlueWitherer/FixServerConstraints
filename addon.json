@@ -7,7 +7,6 @@
     ],
     "ignore": [
         ".git/*",
-        "README.md",
-        "*.jpg"
+        "README.md"
     ]
 }

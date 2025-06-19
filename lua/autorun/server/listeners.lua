@@ -31,11 +31,18 @@ if SERVER then
     -- client notifs
     local function sendNotification(ply, msg, type, time) -- Send a notification to the client
         log:debug("Sending notification to player", ply:Nick(), "with message:", msg, "type:", type, "time:", time)
-        net.Start("FSC_ConstraintResetNotification")
-        net.WriteString(msg)
-        net.WriteUInt(type, 8)
-        net.WriteFloat(time)
-        net.Send(ply)
+        local start = net.Start("FSC_ConstraintResetNotification")
+        if start then -- Start the network message
+            log:debug("Network message started successfully for player", ply:Nick())
+            net.WriteString(msg)
+            net.WriteUInt(type, 8)
+            net.WriteFloat(time)
+            net.Send(ply)
+            log:info("Notification sent to player", ply:Nick())
+        else
+            log:error("Failed to start network message for player", ply:Nick())
+            return
+        end
     end
 
     net.Receive("FSC_SetConstraintConVars", function(len, ply)
@@ -54,16 +61,16 @@ if SERVER then
                     varWeld:SetFloat(weld)
                     log:info("Set", vars.maxwelds.name, "to", weld)
                 else
-                    log:error("Convar", vars.maxwelds.name, "not found")
                     isError = true
+                    log:error("Convar", vars.maxwelds.name, "not found")
                 end
 
                 if varRope then
                     varRope:SetFloat(rope)
                     log:info("Set", vars.maxropes.name, "to", rope)
                 else
-                    log:error("Convar", vars.maxropes.name, "not found")
                     isError = true
+                    log:error("Convar", vars.maxropes.name, "not found")
                 end
 
                 if isError then

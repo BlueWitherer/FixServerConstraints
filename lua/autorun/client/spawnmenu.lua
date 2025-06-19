@@ -50,34 +50,38 @@ if CLIENT then -- Client-side only
             if CheckAdmin() then -- Check for admin
                 log:info("Player has permission to modify constraint limits")
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
-                local weldSlider = pnl:NumSlider("Max Constraints", vars.maxwelds.name, 10, vars.maxwelds.default, 0)
-                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 10, vars.maxropes.default, 0)
+                local weldSlider = pnl:NumSlider("Max Constraints", vars.maxwelds.name, 10, 2000, 0)
+                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 10, 2000, 0)
                 pnl:Help("If you're on a server, you likely cannot update the values in realtime as you adjust the slider. To fix this, press the button below to manually update the constraint limits. This is not required if you're hosting this server on your computer.")
                 local UpdateBtn = pnl:Button("Update Limits")
                 UpdateBtn.DoClick = function()
-                    -- Update button clicked callback
-                    log:debug("Update button clicked, sending new constraint limits to server")
+                    -- Update button pressed callback
+                    log:debug("Update button pressed, sending new constraint limits to server")
                     local weldValue = weldSlider:GetValue()
                     local ropeValue = ropeSlider:GetValue()
                     local start = net.Start("FSC_SetConstraintConVars")
-                    if start then
+                    if start then -- Check if net message started successfully
+                        log:debug("Starting net message for updating constraint limits")
                         net.WriteFloat(weldValue)
                         net.WriteFloat(ropeValue)
                         net.SendToServer()
+                        log:info("Sent new constraint limits:", weldValue, "welds and", ropeValue, "ropes")
                     else
                         log:error("Failed to start net message for updating constraint limits")
                         return
                     end
                 end
 
-                pnl:Help("Reset the constraint limits to their default values.")
+                pnl:Help("Reset all constraint limits to their default values.")
                 local ResetBtn = pnl:Button("Reset to Default")
                 ResetBtn.DoClick = function()
-                    -- Reset button clicked callback
-                    log:debug("Reset button clicked, resetting constraint limits to default")
+                    -- Reset button pressed callback
+                    log:debug("Reset button pressed, resetting constraint limits to default")
                     local start = net.Start("FSC_ResetConstraintConVars")
-                    if start then
+                    if start then -- Check if net message started successfully
+                        log:debug("Starting net message for resetting constraint limits")
                         net.SendToServer()
+                        log:info("Sent request to reset constraint limits to default values")
                     else
                         log:error("Failed to start net message for resetting constraint limits")
                         return
@@ -128,14 +132,16 @@ if CLIENT then -- Client-side only
                 pnl:Help("Press this button if you're not hosting this server to update permissions.")
                 local UpdateBtn = pnl:Button("Update Permission")
                 UpdateBtn.DoClick = function()
-                    -- Update button clicked callback
+                    -- Update button pressed callback
                     log:debug("Update button pressed, sending superadmin restriction update to server")
                     local isChecked = adminCheckBox:GetChecked()
                     log:info("Superadmin restriction is now", isChecked and "enabled" or "disabled")
                     local start = net.Start("FSC_SetConstraintAdmin")
-                    if start then
+                    if start then -- Check if net message started successfully
+                        log:debug("Starting net message for updating superadmin restriction")
                         net.WriteBool(isChecked)
                         net.SendToServer()
+                        log:info("Sent superadmin restriction update to server:", isChecked)
                     else
                         log:error("Failed to start net message for updating superadmin restriction")
                         return

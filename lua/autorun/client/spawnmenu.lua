@@ -1,14 +1,9 @@
 if CLIENT then -- Client-side only
-    -- settings
-    local notificationsVarString = "fsc_enable_notifications"
-    CreateClientConVar(notificationsVarString, "1", true, false, "Enable FixServerConstraints notifications")
     -- logging
     local FSCLogger = include("autorun/print.lua")
     local log = FSCLogger:new()
     -- convars
     local vars = include("autorun/vars.lua")
-    -- notifs
-    local notify = include("autorun/notify.lua")
     -- functions
     local CheckAdmin = function()
         -- Check if the player has permission to modify constraint limits
@@ -16,7 +11,7 @@ if CLIENT then -- Client-side only
         local ply = LocalPlayer()
         if IsValid(ply) then -- Check if player object is valid
             log:debug("Player", ply:Nick(), "is valid, checking permissions...")
-            local AdminBool = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
+            local AdminBool = GetGlobal2Bool(vars.admin.perm.name, true) -- Check if superadmin restriction is enabled
             if AdminBool then
                 log:debug("Superadmin restriction is enabled, checking player status")
                 if ply:IsSuperAdmin() then
@@ -90,7 +85,7 @@ if CLIENT then -- Client-side only
             else
                 log:warn("Player does not have permission to modify constraint limits")
                 local msgTxt = "you cannot change constraint limits." -- Help text
-                local AdminBool = GetGlobal2Bool(vars.adminperm.name, true) -- Check if superadmin restriction is enabled
+                local AdminBool = GetGlobal2Bool(vars.admin.perm.name, true) -- Check if superadmin restriction is enabled
                 if AdminBool then
                     msgTxt = "please ask a superadmin to change constraint limits if you wish."
                 else
@@ -128,7 +123,7 @@ if CLIENT then -- Client-side only
             if ply:IsSuperAdmin() then -- Check if the player is a superadmin
                 log:info("Superadmin detected, adding superadmin-only constraint permission setting")
                 pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
-                local adminCheckBox = pnl:CheckBox("Restrict to Super-Admins", vars.adminperm.name)
+                local adminCheckBox = pnl:CheckBox("Restrict to Super-Admins", vars.admin.perm.name)
                 pnl:Help("Press this button if you're not hosting this server to update permissions.")
                 local UpdateBtn = pnl:Button("Update Permission")
                 UpdateBtn.DoClick = function()
@@ -182,34 +177,12 @@ if CLIENT then -- Client-side only
             end
         else
             log:error("Couldn't scan player's permissions early")
+            return
         end
     end
 
     hook.Add("AddToolMenuCategories", "ConstraintCategories", hookOptions)
     hook.Add("PopulateToolMenu", "ConstraintSettings", hookUtils)
-    -- Events
-    local notif = function()
-        local ifNotifs = GetConVar(notificationsVarString)
-        if ifNotifs then
-            log:debug("Checking notification convar...")
-            if ifNotifs:GetBool() then
-                local msg = net.ReadString()
-                local type = net.ReadUInt(8)
-                local time = net.ReadFloat()
-                log:debug("Displaying notification for", msg, "of type", type, "for time", time)
-                notification.AddLegacy(msg, type, time)
-                notify.sound(type)
-            else
-                log:debug("Notifications are disabled, skipping notification display for", msg, "of type", type, "for time", time)
-                return
-            end
-        else
-            log:error("Notification convar not found, cannot display notifications")
-            return
-        end
-    end
-
-    net.Receive("FSC_ConstraintResetNotification", notif)
 else
     log:error("Client instance not found")
     return

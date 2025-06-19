@@ -13,11 +13,11 @@ if SERVER then
     util.AddNetworkString("FSC_SetConstraintConVars")
     util.AddNetworkString("FSC_ResetConstraintConVars")
     util.AddNetworkString("FSC_SetConstraintAdmin")
-    util.AddNetworkString("FSC_ConstraintResetNotification")
+    util.AddNetworkString("FSC_Notification")
     -- admin check
     local function checkAdmin(ply) -- Check if the player has permission to modify constraint limits
         log:debug("Checking if player has admin...")
-        local AdminVar = GetConVar(vars.adminperm.name)
+        local AdminVar = GetConVar(vars.admin.perm.name)
         if AdminVar then
             local adminBool = AdminVar:GetBool()
             log:debug("Checking admin permission...")
@@ -31,7 +31,7 @@ if SERVER then
     -- client notifs
     local function sendNotification(ply, msg, type, time) -- Send a notification to the client
         log:debug("Sending notification to player", ply:Nick(), "with message:", msg, "type:", type, "time:", time)
-        local start = net.Start("FSC_ConstraintResetNotification")
+        local start = net.Start("FSC_Notification")
         if start then -- Start the network message
             log:debug("Network message started successfully for player", ply:Nick())
             net.WriteString(msg)
@@ -148,7 +148,7 @@ if SERVER then
             if checkAdmin(ply) then
                 local newValue = net.ReadBool()
                 log:debug("Setting superadmin permission convar to", newValue)
-                local superPerm = vars.adminperm.name
+                local superPerm = vars.admin.perm.name
                 local CVsuperPerm = GetConVar(superPerm)
                 if CVsuperPerm then
                     CVsuperPerm:SetBool(newValue)

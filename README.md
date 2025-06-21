@@ -33,6 +33,6 @@ If you're the server operator, you can also type the following variables as comm
 | :---------------------------: | --------------------------------------- | :-----: |
 |   **`sbox_maxconstraints`**   | Maximum weld limit                      | `2000`  |
 | **`sbox_maxropeconstraints`** | Maximum rope limit                      | `1000`  |
-|    `welds_superadminonly`     | Only allow superadmins to change limits |   `1`   |
+|       `fsc_superadmin`        | Only allow superadmins to change limits |   `1`   |
 
 Format: `variable_name {number}`

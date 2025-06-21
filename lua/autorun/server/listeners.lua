@@ -33,14 +33,14 @@ if SERVER then
         log:debug("Sending notification to player", ply:Nick(), "with message:", msg, "type:", type, "time:", time)
         local start = net.Start("FSC_Notification")
         if start then -- Start the network message
-            log:debug("Network message started successfully for player", ply:Nick())
+            log:debug("Network message started successfully from player", ply:Nick())
             net.WriteString(msg)
             net.WriteUInt(type, 8)
             net.WriteFloat(time)
             net.Send(ply)
             log:info("Notification sent to player", ply:Nick())
         else
-            log:error("Failed to start network message for player", ply:Nick())
+            log:error("Failed to start network message from player", ply:Nick())
             return
         end
     end
@@ -54,32 +54,32 @@ if SERVER then
                 log:debug("Player", ply:Nick(), "has required permission, processing request...")
                 local weld = net.ReadFloat()
                 local rope = net.ReadFloat()
-                local varWeld = GetConVar(vars.maxwelds.name)
-                local varRope = GetConVar(vars.maxropes.name)
+                local varWeld = GetConVar(vars.welds.name)
+                local varRope = GetConVar(vars.ropes.name)
                 local isError = false
                 if varWeld then
                     varWeld:SetFloat(weld)
-                    log:info("Set", vars.maxwelds.name, "to", weld)
+                    log:info("Set", vars.welds.name, "to", weld)
                 else
                     isError = true
-                    log:error("Convar", vars.maxwelds.name, "not found")
+                    log:error("Convar", vars.welds.name, "not found")
                 end
 
                 if varRope then
                     varRope:SetFloat(rope)
-                    log:info("Set", vars.maxropes.name, "to", rope)
+                    log:info("Set", vars.ropes.name, "to", rope)
                 else
                     isError = true
-                    log:error("Convar", vars.maxropes.name, "not found")
+                    log:error("Convar", vars.ropes.name, "not found")
                 end
 
                 if isError then
                     sendNotification(ply, "Couldn't update constraint limits", notify.enum.NOTIFY_ERROR, 3)
-                    log:error("Failed to update constraint limits due to missing convars for player", ply:Nick())
+                    log:error("Failed to update constraint limits due to missing convars from player", ply:Nick())
                     return
                 else
                     sendNotification(ply, "Constraint limits updated!", notify.enum.NOTIFY_GENERIC, 3)
-                    log:info("Successfully updated constraint limits for player", ply:Nick())
+                    log:info("Successfully updated constraint limits from player", ply:Nick())
                     return
                 end
             else
@@ -99,8 +99,8 @@ if SERVER then
             if checkAdmin(ply) then
                 log:debug("Resetting constraint limits to default values...")
                 -- Get convar names
-                local weldLimit = vars.maxwelds.name
-                local ropeLimit = vars.maxropes.name
+                local weldLimit = vars.welds.name
+                local ropeLimit = vars.ropes.name
                 -- get convar objects
                 local CVwelds = GetConVar(weldLimit)
                 local CVropes = GetConVar(ropeLimit)
@@ -123,11 +123,11 @@ if SERVER then
 
                 if isError then
                     sendNotification(ply, "Couldn't reset constraint limits", notify.enum.NOTIFY_ERROR, 3)
-                    log:error("Failed to reset constraint limits due to missing convars for player", ply:Nick())
+                    log:error("Failed to reset constraint limits due to missing convars from player", ply:Nick())
                     return
                 else
                     sendNotification(ply, "Constraint limits reset to default!", notify.enum.NOTIFY_UNDO, 3)
-                    log:info("Successfully reset constraint limits for player", ply:Nick())
+                    log:info("Successfully reset constraint limits from player", ply:Nick())
                     return
                 end
             else
@@ -152,7 +152,7 @@ if SERVER then
                 local CVsuperPerm = GetConVar(superPerm)
                 if CVsuperPerm then
                     CVsuperPerm:SetBool(newValue)
-                    SetGlobal2Bool("welds_superadminonly", newValue) -- Sync change globally
+                    SetGlobal2Bool(vars.admin.perm.name, newValue) -- Sync change globally
                     sendNotification(ply, "Permission updated!", notify.enum.NOTIFY_GENERIC, 3)
                     log:info("Synced superadmin permission convar with all clients")
                 else
@@ -161,8 +161,8 @@ if SERVER then
                     return
                 end
             else
-                sendNotification(ply, "You are missing permissions", notify.enum.NOTIFY_ERROR, 3)
                 log:warn("Player", ply:Nick(), "does not have required permission")
+                sendNotification(ply, "You are missing permissions", notify.enum.NOTIFY_ERROR, 3)
                 return
             end
         else
@@ -171,10 +171,10 @@ if SERVER then
         end
     end)
 
-    cvars.AddChangeCallback("welds_superadminonly", function(name, old, new)
+    cvars.AddChangeCallback(vars.admin.perm.name, function(name, old, new)
         -- Callback for superadmin permission convar changes
         log:debug("Detected change in superadmin permission convar...")
-        SetGlobal2Bool("welds_superadminonly", tobool(new)) -- Sync change globally
+        SetGlobal2Bool(vars.admin.perm.name, tobool(new)) -- Sync change globally
         log:info("Synced superadmin permission convar with all clients")
     end)
 else

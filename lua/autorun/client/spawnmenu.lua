@@ -11,7 +11,7 @@ if CLIENT then -- Client-side only
         local ply = LocalPlayer()
         if IsValid(ply) then -- Check if player object is valid
             log:debug("Player", ply:Nick(), "is valid, checking permissions...")
-            local AdminBool = GetGlobal2Bool(vars.admin.perm.name, true) -- Check if superadmin restriction is enabled
+            local AdminBool = GetGlobal2Bool(vars.admin.perm.name, vars.admin.perm.default > 0 or false) -- Check if superadmin restriction is enabled
             if AdminBool then
                 log:debug("Superadmin restriction is enabled, checking player status")
                 if ply:IsSuperAdmin() then
@@ -45,8 +45,8 @@ if CLIENT then -- Client-side only
             if CheckAdmin() then -- Check for admin
                 log:info("Player has permission to modify constraint limits")
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
-                local weldSlider = pnl:NumSlider("Max Constraints", vars.maxwelds.name, 10, 2000, 0)
-                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.maxropes.name, 10, 2000, 0)
+                local weldSlider = pnl:NumSlider("Max Constraints", vars.welds.name, 10, 2000, 0)
+                local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.ropes.name, 10, 2000, 0)
                 pnl:Help("If you're on a server, you likely cannot update the values in realtime as you adjust the slider. To fix this, press the button below to manually update the constraint limits. This is not required if you're hosting this server on your computer.")
                 local UpdateBtn = pnl:Button("Update Limits")
                 UpdateBtn.DoClick = function()
@@ -85,7 +85,7 @@ if CLIENT then -- Client-side only
             else
                 log:warn("Player does not have permission to modify constraint limits")
                 local msgTxt = "you cannot change constraint limits." -- Help text
-                local AdminBool = GetGlobal2Bool(vars.admin.perm.name, true) -- Check if superadmin restriction is enabled
+                local AdminBool = GetGlobal2Bool(vars.admin.perm.name, vars.admin.perm.default > 0 or false) -- Check if superadmin restriction is enabled
                 if AdminBool then
                     msgTxt = "please ask a superadmin to change constraint limits if you wish."
                 else
@@ -105,7 +105,7 @@ if CLIENT then -- Client-side only
         log:debug("Setting up constraint client to spawnmenu options...")
         local ply = LocalPlayer()
         if IsValid(ply) then
-            log:debug("Player", ply:Nick(), "is valid, checking permissions...")
+            log:debug("Player", ply:Nick(), "is valid, creating client settings...")
             pnl:Help("Adjust this addon's settings.")
             pnl:CheckBox("Enable Notifications", vars.client.notifs.name)
             pnl:Help("Toggle display of all notifications on your client. If disabled, you will only see notifications logged in the console.")

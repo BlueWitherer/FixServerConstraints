@@ -1,21 +1,21 @@
 local vars = {
-    maxwelds = {
+    welds = {
         name = "sbox_maxconstraints",
         default = 2000
     },
-    maxropes = {
+    ropes = {
         name = "sbox_maxropeconstraints",
         default = 1000
     },
     client = {
         notifs = {
-            name = "fsc_enable_notifications",
+            name = "fsc_notify",
             default = 1
         }
     },
     admin = {
         perm = {
-            name = "welds_superadminonly",
+            name = "fsc_superadmin",
             default = 1
         }
     }

@@ -5,11 +5,12 @@ local notify = {
         NOTIFY_UNDO = 2,
         NOTIFY_HINT = 3,
         NOTIFY_CLEANUP = 4
-    },
+    }
 }
 
-notify.sound = function(t)
-    if CLIENT then
+-- client only fields
+if CLIENT then
+    notify.sound = function(t)
         if t == notify.enum.NOTIFY_GENERIC then
             surface.PlaySound("buttons/button14.wav")
         elseif t == notify.enum.NOTIFY_ERROR then

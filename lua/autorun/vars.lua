@@ -7,12 +7,6 @@ local vars = {
         name = "sbox_maxropeconstraints",
         default = 1000
     },
-    client = {
-        notifs = {
-            name = "fsc_notify",
-            default = 1
-        }
-    },
     admin = {
         perm = {
             name = "fsc_superadmin",
@@ -20,4 +14,14 @@ local vars = {
         }
     }
 }
+
+-- client only fields
+if CLIENT then
+    vars.client = {
+        notifs = {
+            name = "fsc_notify",
+            default = 1
+        }
+    }
+end
 return vars

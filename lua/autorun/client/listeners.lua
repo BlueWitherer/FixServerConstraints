@@ -10,7 +10,7 @@ if CLIENT then
     local function notif()
         -- Function to handle constraint reset notifications
         log:info("Received constraint reset notification from server")
-        local ifNotifs = GetConVar(vars.client.notifs.name)
+        local ifNotifs = GetConVar(vars.client.notify.name)
         if ifNotifs then
             log:debug("Checking notification convar...")
             local msg = net.ReadString()

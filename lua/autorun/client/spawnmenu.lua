@@ -5,6 +5,25 @@ if CLIENT then -- Client-side only
     -- convars
     local vars = include("autorun/vars.lua")
     -- functions
+    local ShowToOperator = function()
+        -- Function to determine if the admin settings panel should be shown or hidden
+        log:debug("Checking if admin settings panel should be hidden...")
+        local ply = LocalPlayer() -- Get the local player
+        local ifHidePanel = GetConVar(vars.client.hosthidepanel.name) -- Get the host hide panel convar
+        if IsValid(ply) and ifHidePanel then
+            if ply:IsListenServerHost() and ifHidePanel:GetBool() then
+                log:debug("Player is the operator (host), hiding admin settings panel")
+                return false -- Only hide if player is the operator and hide is enabled
+            else
+                log:debug("Player is not the operator or host hide panel is disabled, showing admin settings panel")
+                return true -- Show the admin settings panel for all other players
+            end
+        else
+            log:error("Player instance not found or host hide panel convar is invalid")
+            return false -- Default to hiding the admin settings panel if player or convar is invalid
+        end
+    end
+
     local CheckAdmin = function()
         -- Check if the player has permission to modify constraint limits
         log:debug("Checking if player has admin...")
@@ -47,28 +66,35 @@ if CLIENT then -- Client-side only
                 pnl:Help("Adjust the maximum number of constraints allowed on the server.")
                 local weldSlider = pnl:NumSlider("Max Constraints", vars.welds.name, 10, 2000, 0)
                 local ropeSlider = pnl:NumSlider("Max Rope Constraints", vars.ropes.name, 10, 2000, 0)
-                pnl:Help("If you're on a server, you likely cannot update the values in realtime as you adjust the slider. To fix this, press the button below to manually update the constraint limits. This is not required if you're hosting this server on your computer.")
-                local UpdateBtn = pnl:Button("Update Limits")
-                UpdateBtn.DoClick = function()
-                    -- Update button pressed callback
-                    log:debug("Update button pressed, sending new constraint limits to server")
-                    local weldValue = weldSlider:GetValue()
-                    local ropeValue = ropeSlider:GetValue()
-                    local start = net.Start("FSC_SetConstraintConVars")
-                    if start then -- Check if net message started successfully
-                        log:debug("Starting net message for updating constraint limits")
-                        net.WriteFloat(weldValue)
-                        net.WriteFloat(ropeValue)
-                        net.SendToServer()
-                        log:info("Sent new constraint limits:", weldValue, "welds and", ropeValue, "ropes")
-                    else
-                        log:error("Failed to start net message for updating constraint limits")
-                        return
+                weldSlider:SetTooltip("Set the maximum number of weld constraints allowed on the server.")
+                ropeSlider:SetTooltip("Set the maximum number of rope constraints allowed on the server.")
+                if ShowToOperator() then -- Check if the admin settings panel should be hidden
+                    pnl:Help("Press the button below to manually update the constraint limits on the server.")
+                    local UpdateBtn = pnl:Button("Update Limits")
+                    UpdateBtn:SetTooltip("Request the server to update the constraint limits with the values set in the sliders.")
+                    UpdateBtn.DoClick = function()
+                        -- Update button pressed callback
+                        log:debug("Update button pressed, sending new constraint limits to server")
+                        local weldValue = weldSlider:GetValue()
+                        local ropeValue = ropeSlider:GetValue()
+                        local start = net.Start("FSC_SetConstraintConVars")
+                        if start then -- Check if net message started successfully
+                            log:debug("Starting net message for updating constraint limits")
+                            net.WriteFloat(weldValue)
+                            net.WriteFloat(ropeValue)
+                            net.SendToServer()
+                            log:info("Sent new constraint limits:", weldValue, "welds and", ropeValue, "ropes")
+                        else
+                            log:error("Failed to start net message for updating constraint limits")
+                            return
+                        end
                     end
+                else
+                    log:debug("Manual update panel is hidden due to host hide setting")
                 end
 
-                pnl:Help("Reset all constraint limits to their default values.")
                 local ResetBtn = pnl:Button("Reset to Default")
+                ResetBtn:SetTooltip("Reset all constraint limits to their default values.")
                 ResetBtn.DoClick = function()
                     -- Reset button pressed callback
                     log:debug("Reset button pressed, resetting constraint limits to default")
@@ -107,8 +133,10 @@ if CLIENT then -- Client-side only
         if IsValid(ply) then
             log:debug("Player", ply:Nick(), "is valid, creating client settings...")
             pnl:Help("Adjust this addon's settings.")
-            pnl:CheckBox("Enable Notifications", vars.client.notifs.name)
-            pnl:Help("Toggle display of all notifications on your client. If disabled, you will only see notifications logged in the console.")
+            local checkNotifs = pnl:CheckBox("Enable Notifications", vars.client.notify.name)
+            checkNotifs:SetTooltip("Toggle display of all notifications on your client. If disabled, you will only see notifications logged in the console.")
+            local checkHostHide = pnl:CheckBox("Hide Manual Update Panel", vars.client.hosthidepanel.name)
+            checkHostHide:SetTooltip("Re-join required. If enabled, the 'Update' panel in constraint settings will not be shown if you're hosting this server locally. However, it will always be shown if you're not hosting this server.")
         else
             log:error("Player instance not found")
             return
@@ -118,33 +146,40 @@ if CLIENT then -- Client-side only
     local ConstraintAdmin = function(pnl)
         log:debug("Setting up constraint admin to spawnmenu options...")
         local ply = LocalPlayer()
-        if IsValid(ply) then
+        local ifHidePanel = GetConVar(vars.client.hosthidepanel.name)
+        if IsValid(ply) and ifHidePanel then
             log:debug("Player", ply:Nick(), "is valid, checking permissions...")
             if ply:IsSuperAdmin() then -- Check if the player is a superadmin
                 log:info("Superadmin detected, adding superadmin-only constraint permission setting")
-                pnl:Help("You're a superadmin, you can restrict constraint limit modifications to superadmins only.")
+                pnl:Help("You're a superadmin, you can restrict constraint limit permissions to superadmins only.")
                 local adminCheckBox = pnl:CheckBox("Restrict to Super-Admins", vars.admin.perm.name)
-                pnl:Help("Press this button if you're not hosting this server to update permissions.")
-                local UpdateBtn = pnl:Button("Update Permission")
-                UpdateBtn.DoClick = function()
-                    -- Update button pressed callback
-                    log:debug("Update button pressed, sending superadmin restriction update to server")
-                    local isChecked = adminCheckBox:GetChecked()
-                    log:info("Superadmin restriction is now", isChecked and "enabled" or "disabled")
-                    local start = net.Start("FSC_SetConstraintAdmin")
-                    if start then -- Check if net message started successfully
-                        log:debug("Starting net message for updating superadmin restriction")
-                        net.WriteBool(isChecked)
-                        net.SendToServer()
-                        log:info("Sent superadmin restriction update to server:", isChecked)
-                    else
-                        log:error("Failed to start net message for updating superadmin restriction")
-                        return
+                adminCheckBox:SetTooltip("If enabled, only superadmins can modify constraint limits. If disabled, admins can also modify them.")
+                if ShowToOperator() then -- Check if the admin settings panel should be hidden
+                    pnl:Help("Press the button below to update permissions.")
+                    local UpdateBtn = pnl:Button("Update Permission")
+                    UpdateBtn:SetTooltip("Update the superadmin restriction setting on the server.")
+                    UpdateBtn.DoClick = function()
+                        -- Update button pressed callback
+                        log:debug("Update button pressed, sending superadmin restriction update to server")
+                        local isChecked = adminCheckBox:GetChecked()
+                        log:info("Superadmin restriction is now", isChecked and "enabled" or "disabled")
+                        local start = net.Start("FSC_SetConstraintAdmin")
+                        if start then -- Check if net message started successfully
+                            log:debug("Starting net message for updating superadmin restriction")
+                            net.WriteBool(isChecked)
+                            net.SendToServer()
+                            log:info("Sent superadmin restriction update to server:", isChecked)
+                        else
+                            log:error("Failed to start net message for updating superadmin restriction")
+                            return
+                        end
                     end
+                else
+                    log:debug("Manual update panel is hidden due to host hide setting")
                 end
             else
                 log:warn("Player does not have permission to modify constraint permissions")
-                pnl:Help("You do not have permission to change any settings.")
+                pnl:Help("You do not have permission to change permission settings.")
             end
         else
             log:error("Player instance not found")

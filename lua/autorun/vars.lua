@@ -18,10 +18,14 @@ local vars = {
 -- client only fields
 if CLIENT then
     vars.client = {
-        notifs = {
+        notify = {
             name = "fsc_notify",
             default = 1
-        }
+        },
+        hosthidepanel = {
+            name = "fsc_hosthidepanel",
+            default = 1
+        },
     }
 end
 return vars

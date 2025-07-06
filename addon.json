@@ -3,6 +3,7 @@
     "description": "Fix constraint limits for your dedicated Garry's Mod server.",
     "type": "servercontent",
     "tags": [
+        "build",
         "fun"
     ],
     "ignore": [

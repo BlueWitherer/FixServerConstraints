@@ -1,13 +1,10 @@
 if SERVER then
     -- logging
-    AddCSLuaFile("autorun/print.lua")
     local FSCLogger = include("autorun/print.lua")
     local log = FSCLogger:new()
     -- convars
-    AddCSLuaFile("autorun/vars.lua")
     local vars = include("autorun/vars.lua")
     -- notifs
-    AddCSLuaFile("autorun/notify.lua")
     local notify = include("autorun/notify.lua")
     -- event listerners
     util.AddNetworkString("FSC_SetConstraintConVars")

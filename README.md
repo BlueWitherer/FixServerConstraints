@@ -7,7 +7,7 @@ Fix constraint limits for your dedicated Garry's Mod server.
 >  
 > [<img alt="Subscriptions" src="https://img.shields.io/steam/downloads/3497996983?style=for-the-badge&logo=steam&logoColor=ffffff&label=Subscriptions">](https://steamcommunity.com/sharedfiles/filedetails/?id=3497996983)
 
-Can't use ropes or welds on your dedicated server? Don't worry! This addon fixes that, and makes it easy to manage!
+Can't use ropes or welds on your dedicated server? Don't worry! This addon fixes that, and makes it super easy to manage!
 
 > [!TIP]
 > *This addon has settings you can utilize to customize your experience.*
@@ -31,10 +31,10 @@ If you're an admin, you can find configurations in the spawnmenu in `Utilities` 
 
 If you're the server operator, you can also type the following variables as commands in the console to modify them.
 
-|           Variable            | About                                   | Default |
-| :---------------------------: | --------------------------------------- | :-----: |
-|   **`sbox_maxconstraints`**   | Maximum weld limit                      | `2000`  |
-| **`sbox_maxropeconstraints`** | Maximum rope limit                      | `1000`  |
-|       `fsc_superadmin`        | Only allow superadmins to change limits |   `1`   |
+|           Variable            | About                                | Default |
+| :---------------------------: | ------------------------------------ | :-----: |
+|   **`sbox_maxconstraints`**   | Maximum weld limit                   | `2000`  |
+| **`sbox_maxropeconstraints`** | Maximum rope limit                   | `1000`  |
+|       `fsc_superadmin`        | Only allow superadmins to use the UI |   `1`   |
 
 Format: `variable_name {number}`
